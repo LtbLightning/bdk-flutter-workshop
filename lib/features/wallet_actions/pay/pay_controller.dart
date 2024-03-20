@@ -86,7 +86,7 @@ class PayController {
 
       final txId = await _bitcoinWalletService.pay(
         state.invoice!,
-        amountSat: state.amountSat,
+        amountSat: state.amountSat!,
         satPerVbyte: state.satPerVbyte,
       );
 

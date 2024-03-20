@@ -9,7 +9,7 @@ abstract class WalletService {
   Future<List<TransactionEntity>> getTransactions();
   Future<String> pay(
     String invoice, {
-    int? amountSat,
+    required int amountSat,
     double? satPerVbyte,
     int? absoluteFeeSat,
   });

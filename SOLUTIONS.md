@@ -2,7 +2,7 @@
 
 Here you can find the completed functions for the `BitcoinWalletService` class. If you get stuck, take a look at the solutions to get an idea of how to proceed or compare your solution with the provided one. Of course in software development there are many ways to code a solution, so your solution might look different from the provided one and still be correct.
 
-## Generate a new private key
+## 1. Generate a new private key
 
 ```dart
 @override
@@ -21,7 +21,7 @@ Future<void> addWallet() async {
 }
 ```
 
-## Initialize a BIP84 (Native SegWit) wallet
+## 2-5. Initialize a BIP84 (Native SegWit) wallet
 
 ```dart
 Future<void> _initWallet(Mnemonic mnemonic) async {
@@ -56,7 +56,7 @@ Future<void> _initWallet(Mnemonic mnemonic) async {
 }
 ```
 
-## Initialize a Blockchain data source
+## 6. Initialize a Blockchain data source
 
 ```dart
 Future<void> _initBlockchain() async {
@@ -75,7 +75,7 @@ Future<void> _initBlockchain() async {
 }
 ```
 
-## Sync the wallet
+## 7. Sync the wallet
 
 ```dart
 @override
@@ -87,7 +87,7 @@ Future<void> sync() async {
 }
 ```
 
-## Get the spendable balance
+## 8. Get the spendable balance
 
 ```dart
 @override
@@ -106,5 +106,88 @@ Future<int> getSpendableBalanceSat() async {
     print('Total balance: ${balance.total}');
 
     return balance.spendable;
+}
+```
+
+## 9. Generate a new address
+
+```dart
+@override
+Future<String> generateInvoice() async {
+    // 9. Get a new unused address from the wallet and return it as a String.
+    final invoice = await _wallet!.getAddress(
+      addressIndex: const AddressIndex(),
+    );
+
+    return invoice.address;
+}
+```
+
+## 10. Get the transaction history
+
+```dart
+@override
+Future<List<TransactionEntity>> getTransactions() async {
+    // 10. Get the list of transactions from the wallet and return them as a list of `TransactionEntity` instances.
+    final transactions = await _wallet!.listTransactions(false);
+
+    return transactions.map((tx) {
+      return TransactionEntity(
+        id: tx.txid,
+        receivedAmountSat: tx.received,
+        sentAmountSat: tx.sent,
+        timestamp: tx.confirmationTime?.timestamp,
+      );
+    }).toList();
+}
+```
+
+## 11-21. Pay to an address
+
+```dart
+@override
+Future<String> pay(
+String invoice, {
+required int amountSat,
+double? satPerVbyte,
+int? absoluteFeeSat,
+}) async {
+    // 11. Convert the invoice String to a BDK Address type
+    final address = await Address.create(address: invoice);
+
+    // 12. Use the address to get the script that would lock a transaction output to the address
+    final script = await address
+        .scriptPubKey(); // Creates the output scripts so that the wallet that generated the address can spend the funds
+
+    // 13. Initialize a `TxBuilder` instance.
+    final txBuilder = TxBuilder();
+
+    // 14. Add the recipient and the amount to send to the transaction builder.
+    txBuilder.addRecipient(script, amountSat);
+
+    // 15. Set the fee rate for the transaction based on the provided fee rate or absolute fee on the transaction builder.
+    if (satPerVbyte != null) {
+      txBuilder.feeRate(satPerVbyte);
+    } else if (absoluteFeeSat != null) {
+      txBuilder.feeAbsolute(absoluteFeeSat);
+    }
+
+    // 16. Enable RBF (Replace-By-Fee) on the transaction builder
+    txBuilder.enableRbf();
+
+    // 17. Finish the transaction building
+    final txBuilderResult = await txBuilder.finish(_wallet!);
+
+    // 18. Sign the transaction with the wallet
+    final sbt = await _wallet!.sign(psbt: txBuilderResult.psbt);
+
+    // 19. Extract the transaction as bytes from the finalized and signed PSBT
+    final tx = await sbt.extractTx();
+
+    // 20. Broadcast the transaction to the network with the `Blockchain` instance
+    await _blockchain.broadcast(tx);
+
+    // 21. Return the transaction id
+    return tx.txid();
 }
 ```

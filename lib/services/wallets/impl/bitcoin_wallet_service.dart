@@ -54,6 +54,13 @@ class BitcoinWalletService implements WalletService {
   }
 
   @override
+  Future<void> sync() async {
+    if (!hasWallet) return;
+
+    // 7. Sync the wallet with the blockchain
+  }
+
+  @override
   Future<int> getSpendableBalanceSat() async {
     if (!hasWallet) return 0;
 
@@ -64,74 +71,72 @@ class BitcoinWalletService implements WalletService {
 
   @override
   Future<String> generateInvoice() async {
-    final invoice = await _wallet!.getAddress(
-      addressIndex: const AddressIndex(),
-    );
+    // 9. Get a new unused address from the wallet and return it as a String.
 
-    return invoice.address;
+    return '';
   }
 
   @override
   Future<List<TransactionEntity>> getTransactions() async {
-    final transactions = await _wallet!.listTransactions(true);
+    // 10. Get the list of transactions from the wallet and return them as a list of `TransactionEntity` instances.
 
-    return transactions.map((tx) {
-      return TransactionEntity(
-        id: tx.txid,
-        receivedAmountSat: tx.received,
-        sentAmountSat: tx.sent,
-        timestamp: tx.confirmationTime?.timestamp,
-      );
-    }).toList();
+    return [];
   }
 
   @override
   Future<String> pay(
     String invoice, {
-    int? amountSat,
+    required int amountSat,
     double? satPerVbyte,
     int? absoluteFeeSat,
   }) async {
-    if (amountSat == null) {
-      throw Exception('Amount is required for a bitcoin on-chain transaction!');
-    }
-
-    // Convert the invoice to an address
+    // 11. Convert the invoice String to a BDK Address type
     final address = await Address.create(address: invoice);
+
+    // 12. Use the address to get the script that would lock a transaction output to the address
     final script = await address
         .scriptPubKey(); // Creates the output scripts so that the wallet that generated the address can spend the funds
-    var txBuilder = TxBuilder().addRecipient(script, amountSat);
 
-    // Set the fee rate for the transaction
+    // 13. Initialize a `TxBuilder` instance.
+    final txBuilder = TxBuilder();
+
+    // 14. Add the recipient and the amount to send to the transaction builder.
+    txBuilder.addRecipient(script, amountSat);
+
+    // 15. Set the fee rate for the transaction based on the provided fee rate or absolute fee on the transaction builder.
     if (satPerVbyte != null) {
-      txBuilder = txBuilder.feeRate(satPerVbyte);
+      txBuilder.feeRate(satPerVbyte);
     } else if (absoluteFeeSat != null) {
-      txBuilder = txBuilder.feeAbsolute(absoluteFeeSat);
+      txBuilder.feeAbsolute(absoluteFeeSat);
     }
 
+    // 16. Enable RBF (Replace-By-Fee) on the transaction builder
+    txBuilder.enableRbf();
+
+    // 17. Finish the transaction building
     final txBuilderResult = await txBuilder.finish(_wallet!);
+
+    // 18. Sign the transaction with the wallet
     final sbt = await _wallet!.sign(psbt: txBuilderResult.psbt);
+
+    // 19. Extract the transaction as bytes from the finalized and signed PSBT
     final tx = await sbt.extractTx();
+
+    // 20. Broadcast the transaction to the network with the `Blockchain` instance
     await _blockchain.broadcast(tx);
 
+    // 21. Return the transaction id
     return tx.txid();
-  }
-
-  @override
-  Future<void> sync() async {
-    if (!hasWallet) return;
-
-    // 7. Sync the wallet with the blockchain
   }
 
   Future<RecommendedFeeRatesEntity> calculateFeeRates() async {
     final [highPriority, mediumPriority, lowPriority, noPriority] =
         await Future.wait(
       [
-        _blockchain.estimateFee(5),
-        _blockchain.estimateFee(144),
-        _blockchain.estimateFee(504),
-        _blockchain.estimateFee(1008),
+        _blockchain.estimateFee(1),
+        _blockchain.estimateFee(2),
+        _blockchain.estimateFee(3),
+        _blockchain.estimateFee(4),
       ],
     );
 

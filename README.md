@@ -19,3 +19,9 @@ The main goal of this workshop is to introduce you to the Bitcoin Development Ki
 ## ⚠️ To do before the workshop
 
 Follow the instructions in the [PREREQUISITES.md](PREREQUISITES.md) file to install the required software to be able to participate in the workshop.
+
+## Workshop Dynamics
+
+The workshop can be given by an instructor showing the code and explaining the concepts, while the participants follow along and implement the code themselves.
+It can also be given as a self-paced workshop where the participants follow the [instructions](INSTRUCTIONS.md) in this repository and implement the code themselves while the instructor is available for questions and to make sure everyone gets through the workshop.
+It can also be a mix of both, or be done completely self-paced without an instructor by just following the [instructions](INSTRUCTIONS.md) and looking at the [solutions](SOLUTIONS.md) to compare or when stuck.
