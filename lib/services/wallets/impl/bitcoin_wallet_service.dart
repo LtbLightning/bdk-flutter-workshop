@@ -91,42 +91,27 @@ class BitcoinWalletService implements WalletService {
     int? absoluteFeeSat,
   }) async {
     // 11. Convert the invoice String to a BDK Address type
-    final address = await Address.create(address: invoice);
 
     // 12. Use the address to get the script that would lock a transaction output to the address
-    final script = await address
-        .scriptPubKey(); // Creates the output scripts so that the wallet that generated the address can spend the funds
 
     // 13. Initialize a `TxBuilder` instance.
-    final txBuilder = TxBuilder();
 
     // 14. Add the recipient and the amount to send to the transaction builder.
-    txBuilder.addRecipient(script, amountSat);
 
     // 15. Set the fee rate for the transaction based on the provided fee rate or absolute fee on the transaction builder.
-    if (satPerVbyte != null) {
-      txBuilder.feeRate(satPerVbyte);
-    } else if (absoluteFeeSat != null) {
-      txBuilder.feeAbsolute(absoluteFeeSat);
-    }
 
     // 16. Enable RBF (Replace-By-Fee) on the transaction builder
-    txBuilder.enableRbf();
 
     // 17. Finish the transaction building
-    final txBuilderResult = await txBuilder.finish(_wallet!);
 
     // 18. Sign the transaction with the wallet
-    final sbt = await _wallet!.sign(psbt: txBuilderResult.psbt);
 
     // 19. Extract the transaction as bytes from the finalized and signed PSBT
-    final tx = await sbt.extractTx();
 
     // 20. Broadcast the transaction to the network with the `Blockchain` instance
-    await _blockchain.broadcast(tx);
 
     // 21. Return the transaction id
-    return tx.txid();
+    return '';
   }
 
   Future<RecommendedFeeRatesEntity> calculateFeeRates() async {

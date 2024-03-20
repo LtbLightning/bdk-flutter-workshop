@@ -4,6 +4,7 @@ abstract class WalletService {
   bool get hasWallet;
   Future<void> addWallet();
   Future<void> deleteWallet();
+  Future<void> sync();
   Future<int> getSpendableBalanceSat();
   Future<String> generateInvoice();
   Future<List<TransactionEntity>> getTransactions();
@@ -13,5 +14,4 @@ abstract class WalletService {
     double? satPerVbyte,
     int? absoluteFeeSat,
   });
-  Future<void> sync();
 }
