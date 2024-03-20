@@ -26,7 +26,7 @@ In the [`lib/services/wallets`](./lib/services/wallets) folder you can find the 
 
 The missing code parts in the `BitcoinWalletService` class have numbered comments to guide you through the implementation one function at a time.
 
-Solutions are also provided in the [`solutions`](./solutions/) folder, but try to implement the functions yourself first. If you get stuck, take a look at the solutions to get an idea of how to proceed.
+Solutions are also provided in the [solutions](SOLUTIONS.md) file, but try to implement the functions yourself first. If you get stuck, take a look at the solutions to get an idea of how to proceed.
 
 ## 1. Generate a new private key
 
