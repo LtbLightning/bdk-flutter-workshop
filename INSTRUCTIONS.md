@@ -8,6 +8,9 @@ To implement a complete app including UI components, state management, controlle
 
 Take a look at the different files and folders in the [`lib`](./lib/) folder. This is the folder where the code of a Flutter/Dart app should be located.
 
+> [!NOTE]
+> The minSdkVersion in the [`android/app/build.gradle`](./android/app/build.gradle) file is also changed to 23 already. This is the minimum version required by the `bdk_flutter` package to work on Android.
+
 ### Run the app
 
 Start the app to make sure the provided code is working. You should see the user interface of the app, but it is based on hardcoded data and does not really permits you to make any transactions.
