@@ -12,7 +12,7 @@ Take a look at the different files and folders in the [`lib`](./lib/) folder. Th
 > If you cloned this repository, the `bdk_flutter` package is already added to the dependencies in the [`pubspec.yaml`](./pubspec.yaml) file and is ready to be used.
 
 > [!NOTE]
-> The minSdkVersion in the [`android/app/build.gradle`](./android/app/build.gradle) file is also changed to 23 already. This is the minimum version required by the `bdk_flutter` package to work on Android.
+> The minSdkVersion in the [`android/app/build.gradle`](./android/app/build.gradle) file is also changed to 23 already. Also the iOS platform version in [`ios/Podfile`](./ios/Podfile) is set to 12.0. These are the minimum versions required by the `bdk_flutter` package to work.
 
 ### Run the app
 
