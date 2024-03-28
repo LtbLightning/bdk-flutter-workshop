@@ -148,7 +148,7 @@ Future<List<TransactionEntity>> getTransactions() async {
 }
 ```
 
-## 11-21. Pay to an address
+## 11-20. Pay to an address
 
 The BDK library offers a `TxBuilder` class to help with building different kind of transactions making it very flexible.
 For example, you can build a transaction with RBF (Replace-By-Fee) enabled on the transaction, which allows you to bump the fee of the transaction later if it is not confirming fast enough. This way your user can try to send the transaction with a low fee first and then bump the fee if needed.
@@ -183,10 +183,13 @@ int? absoluteFeeSat,
 
     // 19. Extract the transaction as bytes from the finalized and signed PSBT
 
-    // 20. Broadcast the transaction to the network with the `Blockchain` instance
+    // 20. Broadcast the transaction to the network with the `Blockchain` instance,
+    //  this should return the transaction id.
+    final txId = "";
 
-    // 21. Return the transaction id
-    return '';
+    print('Transaction broadcasted: $txId');
+
+    return txId;
 }
 ```
 

@@ -110,10 +110,13 @@ class BitcoinWalletService implements WalletService {
 
     // 19. Extract the transaction as bytes from the finalized and signed PSBT
 
-    // 20. Broadcast the transaction to the network with the `Blockchain` instance
+    // 20. Broadcast the transaction to the network with the `Blockchain` instance,
+    //  this should return the transaction id.
+    final txId = "";
 
-    // 21. Return the transaction id
-    return '';
+    print('Transaction broadcasted: $txId');
+
+    return txId;
   }
 
   Future<RecommendedFeeRatesEntity> calculateFeeRates() async {
