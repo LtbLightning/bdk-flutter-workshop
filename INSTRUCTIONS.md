@@ -42,7 +42,7 @@ Future<void> addWallet() async {
         'test test test test test test test test test test test test',
     );
 
-    await _mnemonicRepository.setMnemonic(mnemonic.asString());
+    await _mnemonicRepository.setMnemonic(await mnemonic.asString());
 
     await _initWallet(mnemonic);
 
@@ -230,18 +230,18 @@ Future<RecommendedFeeRatesEntity> calculateFeeRates() async {
     final [highPriority, mediumPriority, lowPriority, noPriority] =
         await Future.wait(
       [
-        _blockchain.estimateFee(1),
-        _blockchain.estimateFee(2),
-        _blockchain.estimateFee(3),
-        _blockchain.estimateFee(4),
+        _blockchain.estimateFee(target: 1),
+        _blockchain.estimateFee(target: 2),
+        _blockchain.estimateFee(target: 3),
+        _blockchain.estimateFee(target: 4),
       ],
     );
 
     return RecommendedFeeRatesEntity(
-      highPriority: highPriority.asSatPerVb(),
-      mediumPriority: mediumPriority.asSatPerVb(),
-      lowPriority: lowPriority.asSatPerVb(),
-      noPriority: noPriority.asSatPerVb(),
+      highPriority: highPriority.satPerVb,
+      mediumPriority: mediumPriority.satPerVb,
+      lowPriority: lowPriority.satPerVb,
+      noPriority: noPriority.satPerVb,
     );
 }
 ```
@@ -263,10 +263,10 @@ There are many things to take into consideration. If your users are not privacy 
 For users that do care about privacy, BDK does offer us the flexibility to implement our own coin selection strategy or implement a way to let the user select the utxo's manually. This is a bit more advanced and we will not implement it in this workshop, but it is good to know that it is possible. There are different methods available for this in the `TxBuilder` and `Wallet` classes of the BDK library:
 
 ```dart
-TxBuilder().addUtxo(outpoint); // Add a specific utxo to spend in the transaction
-TxBuilder().addUtxos(outpoints); // Add a list of specific utxo's to spend in the transaction
+TxBuilder().addUtxo(OutPoint(txid: <txid>, vout: <vout>)); // Add a specific utxo to spend in the transaction
+TxBuilder().addUtxos([OutPoint(txid: <txid>, vout: <vout>)]); // Add a list of specific utxo's to spend in the transaction
 TxBuilder().doNotSpendChange(); // Makes sure no change utxo's are spent in the transaction
-TxBuilder().addUnSpendable(unSpendable); // Add a specific utxo to not spend in the transaction
+TxBuilder().addUnSpendable(OutPoint(txid: <txid>, vout: <vout>)); // Add a specific utxo to not spend in the transaction
 TxBuilder().manuallySelectedOnly(); // Makes sure only manually selected utxo's are spent in the transaction
 TxBuilder().onlySpendChange(); // Makes sure only change utxo's are spent in the transaction
 _wallet.listUnspent(); // List all utxo's of the wallet (_wallet is a `Wallet` instance)
@@ -287,5 +287,5 @@ TxBuilder().draiWallet();
 The method `drainTo` is a variant that will send the change utxo's of the transaction, in case you add utxo's that make the total amount exceed the amount to send to the recipient address, to a specific address instead of back to the wallet:
 
 ```dart
-TxBuilder().drainTo(<script>);
+TxBuilder().drainTo(ScriptBuf(bytes: <script>));
 ```

@@ -38,7 +38,9 @@ class BitcoinWalletService implements WalletService {
       'test test test test test test test test test test test test',
     );
 
-    await _mnemonicRepository.setMnemonic(mnemonic.asString());
+    await _mnemonicRepository.setMnemonic(
+      await mnemonic.asString(),
+    );
 
     await _initWallet(mnemonic);
 
@@ -118,18 +120,18 @@ class BitcoinWalletService implements WalletService {
     final [highPriority, mediumPriority, lowPriority, noPriority] =
         await Future.wait(
       [
-        _blockchain.estimateFee(1),
-        _blockchain.estimateFee(2),
-        _blockchain.estimateFee(3),
-        _blockchain.estimateFee(4),
+        _blockchain.estimateFee(target: 1),
+        _blockchain.estimateFee(target: 2),
+        _blockchain.estimateFee(target: 3),
+        _blockchain.estimateFee(target: 4),
       ],
     );
 
     return RecommendedFeeRatesEntity(
-      highPriority: highPriority.asSatPerVb(),
-      mediumPriority: mediumPriority.asSatPerVb(),
-      lowPriority: lowPriority.asSatPerVb(),
-      noPriority: noPriority.asSatPerVb(),
+      highPriority: highPriority.satPerVb,
+      mediumPriority: mediumPriority.satPerVb,
+      lowPriority: lowPriority.satPerVb,
+      noPriority: noPriority.satPerVb,
     );
   }
 
